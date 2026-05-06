@@ -1,0 +1,5 @@
+package com.aman.matchingengine.model;
+
+public enum OrderStatus {
+    OPEN, PARTIALLY_FILLED, FILLED, REJECTED
+}
