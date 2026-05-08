@@ -13,11 +13,17 @@ public class MatchingEngine {
     private final Map<String, OrderBook> orderBooks;
     private final AtomicLong sequenceGenerator;
     private  final AtomicLong orderIdGenerator;
+    private final boolean loggingEnabled;
 
-    public MatchingEngine() {
+    public MatchingEngine(){
+        this(true);
+    }
+
+    public MatchingEngine(Boolean loggingEnabled) {
         this.orderBooks = new HashMap<>();
         this.sequenceGenerator = new AtomicLong(1);
         this.orderIdGenerator = new AtomicLong(1);
+        this.loggingEnabled = loggingEnabled;
     }
 
     public OrderPlacementResult placeOrder(String symbol, OrderSide side, long price, long quantity) {
