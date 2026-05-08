@@ -1,71 +1,63 @@
 package com.aman.matchingengine;
 
 
-import com.aman.matchingengine.engine.OrderBook;
-import com.aman.matchingengine.model.Order;
+import com.aman.matchingengine.engine.MatchingEngine;
+import com.aman.matchingengine.engine.OrderPlacementResult;
 import com.aman.matchingengine.model.OrderSide;
 import com.aman.matchingengine.model.Trade;
 
-import java.time.Instant;
-import java.util.List;
-
 public class Main {
     public static void main(String[] args) {
-        OrderBook orderBook = new OrderBook("AAPL");
+        MatchingEngine engine = new MatchingEngine();
 
-        orderBook.addOrder(new Order(
-                "S-1",
-                "AAPL",
-                OrderSide.SELL,
-                18550,
-                100,
-                1,
-                Instant.now()
-        ));
+        //Seed AAPL book
+        engine.placeOrder("AAPL-S1", "AAPL", OrderSide.SELL, 18550, 100);
+        engine.placeOrder("AAPL-S2", "AAPL", OrderSide.SELL, 18600, 50);
+        engine.placeOrder("AAPL-B1", "AAPL", OrderSide.BUY, 18450, 80);
 
-        orderBook.addOrder(new Order(
-                "S-2",
-                "AAPL",
-                OrderSide.SELL,
-                18600,
-                50,
-                2,
-                Instant.now()
-        ));
+        //Seed MSFT book
+        engine.placeOrder("MSFT-B1", "MSFT", OrderSide.BUY, 40100, 70);
+        engine.placeOrder("MSFT-S1", "MSFT", OrderSide.SELL, 40300, 60);
 
-        orderBook.addOrder(new Order(
-                "B-OLD",
-                "AAPL",
-                OrderSide.BUY,
-                18400,
-                80,
-                3,
-                Instant.now()
-        ));
+        System.out.println();
+        System.out.println("=== BEFORE NEW ORDERS ===");
+        System.out.println(engine.printOrderBook("AAPL"));
+        System.out.println(engine.printOrderBook("MSFT"));
 
-        System.out.println("BOOK BEFORE MATCHING");
-        System.out.println(orderBook.printBook());
-
-        Order incomingBuy = new Order(
-                "B-1",
+        OrderPlacementResult applResult = engine.placeOrder(
+                "AAPL-B2",
                 "AAPL",
                 OrderSide.BUY,
                 18600,
-                180,
-                4,
-                Instant.now()
+                120
         );
 
-        List<Trade> trades = orderBook.processOrder(incomingBuy);
+        System.out.println();
+        System.out.println("=== TRADES GENERATED FOR APPL-B2 ===");
+        for(Trade trade: applResult.getTrades()) {
+            System.out.println(trade);
+        }
 
-        System.out.println("TRADE GENERATED");
-        for(Trade trade : trades) {
+        OrderPlacementResult msftResult = engine.placeOrder(
+                "MSFT-S2",
+                "MSFT",
+                OrderSide.SELL,
+                40050,
+                50
+        );
+
+        System.out.println();
+        System.out.println("=== TRADES GENERATED FOR MSFT-s2 ===");
+        for(Trade trade: msftResult.getTrades()) {
             System.out.println(trade);
         }
 
         System.out.println();
-        System.out.println("BOOK AFTER MATCHING");
-        System.out.println(orderBook.printBook());
+        System.out.println("=== AFTER NEW ORDERS ===");
+        System.out.println(engine.printOrderBook("AAPL"));
+        System.out.println(engine.printOrderBook("MSFT"));
+
+        System.out.println("Tracked symbols: " + engine.getTrackedSymbols());
 
     }
 }
